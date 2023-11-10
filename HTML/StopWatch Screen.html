@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+		body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('Artboard 1.png');
+            background-size: cover;
+            background-position: center;
+            font-family: 'segment', Arial, sans-serif;
+			color: white;
+        }
+		@font-face {
+            font-family: 'segment';
+            src: url('fonts/Segment7Standard.otf') format('opentype');
+        }
+
+        .stopwatch {
+            font-size: 15em;
+            font-family: 'segment'; /* Use the custom font */
+			text-shadow: 10px 10px 30px rgba(255, 255, 255, 0.3);
+        }
+		.logo {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">0:00:00.000</div>
+	<div class="logo">
+        <img src="Logo Normal.png" width="300">
+    </div>
+	
+    <script>
+        let startTime = 0;
+		let pausedTime = 0;
+        let intervalId = null;
+        let running = false;
+        let paused = false;
+
+        const stopwatchElement = document.querySelector('.stopwatch');
+
+        function updateStopwatch() {
+			const currentTime = new Date().getTime();
+			const elapsedTime = currentTime - startTime;
+			const hours = Math.floor(elapsedTime / 3600000);
+			const minutes = Math.floor((elapsedTime % 3600000) / 60000);
+			const seconds = Math.floor((elapsedTime % 60000) / 1000);
+			const milliseconds = elapsedTime % 1000;
+			stopwatchElement.textContent = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(milliseconds).padStart(3, '0')}`;
+		}
+		
+		
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'PageUp') {
+				if (!running) {
+					if(!paused){
+						startTime = new Date().getTime();
+					}
+					else {
+						const currentTime = new Date().getTime();
+						startTime = currentTime-pausedTime;
+					}
+					intervalId = setInterval(updateStopwatch, 10); // Update every 10 milliseconds
+					running = true;
+					paused = false;
+				}
+            } 
+			else if (event.key === 'PageDown'){
+				if (running) {
+					clearInterval(intervalId);
+					running = false;
+					paused = true;
+					const currentTime = new Date().getTime();
+					pausedTime = currentTime - startTime;
+					startTime += pausedTime;
+				}
+			}
+			else if (event.key === 'ArrowLeft'){
+				if (!running) {
+					clearInterval(intervalId);
+					startTime = new Date().getTime();
+					updateStopwatch();
+					running = false;
+					paused = false;
+				}
+			}
+        });
+    </script>
+</body>
+</html>
